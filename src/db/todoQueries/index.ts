@@ -20,54 +20,77 @@ export async function addTodo(
   { title, description, userId }: AddTodo,
   c: Context
 ) {
-  const { todo } = getPrisma(c.env.DATABASE_URL);
-  const addedTodo = await todo.create({
-    data: {
-      title,
-      description,
-      userId,
-    },
-  });
+  try {
+    const { todo } = getPrisma(c.env.DATABASE_URL);
+    const addedTodo = await todo.create({
+      data: {
+        title,
+        description,
+        userId,
+      },
+    });
 
-  return addedTodo;
+    return addedTodo;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
-export async function getTodo(todoId: number, c: Context) {
-  const { todo } = getPrisma(c.env.DATABASE_URL);
-  const res = await todo.findFirst({
-    where: {
-      id: todoId,
-    },
-  });
-  return res;
+export async function getTodo({ todoId }: { todoId: number }, c: Context) {
+  try {
+    const { todo } = getPrisma(c.env.DATABASE_URL);
+    const todoDetails = await todo.findFirst({
+      where: {
+        id: todoId,
+      },
+    });
+    return todoDetails;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
-export async function getTodosForAParticularUser(userId: number, c: Context) {
-  const { todo } = getPrisma(c.env.DATABASE_URL);
-  const todos = await todo.findMany({
-    where: {
-      userId,
-    },
-  });
-  return todos;
+export async function getTodosForAParticularUser(
+  { userId }: { userId: number },
+  c: Context
+) {
+  try {
+    const { todo } = getPrisma(c.env.DATABASE_URL);
+    const todos = await todo.findMany({
+      where: {
+        userId,
+      },
+    });
+    return todos;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 export async function updateTodo(
   { title, description, userId, todoId }: UpdateTodo,
   c: Context
 ) {
-  const { todo } = getPrisma(c.env.DATABASE_URL);
-  const updatedTodo = await todo.update({
-    where: {
-      id: todoId,
-      userId, //not necessary to use it, I am using it anyway
-    },
-    data: {
-      title,
-      description,
-    },
-  });
-  return updatedTodo;
+  try {
+    const { todo } = getPrisma(c.env.DATABASE_URL);
+    const updatedTodo = await todo.update({
+      where: {
+        id: todoId,
+        userId, //not necessary to use it, I am using it anyway
+      },
+      data: {
+        title,
+        description,
+      },
+    });
+    return updatedTodo;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 export async function deleteTodo(
@@ -80,12 +103,17 @@ export async function deleteTodo(
   },
   c: Context
 ) {
-  const { todo } = getPrisma(c.env.DATABASE_URL);
-  const deletedTodo = await todo.delete({
-    where: {
-      id: todoId,
-      userId,
-    },
-  });
-  return deletedTodo;
+  try {
+    const { todo } = getPrisma(c.env.DATABASE_URL);
+    const deletedTodo = await todo.delete({
+      where: {
+        id: todoId,
+        userId,
+      },
+    });
+    return deletedTodo;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
