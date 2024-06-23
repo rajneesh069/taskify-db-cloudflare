@@ -1,0 +1,5 @@
+name = "prisma-worker"
+compatibility_date = "2023-12-01"
+[vars]
+DATABASE_URL = "prisma_accelerate_link"
+DIRECT_URL = "postgres_db_url"
