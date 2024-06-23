@@ -1,6 +1,7 @@
 # How to run and setup the project locally?
 
 1. Clone the repo.
+
 2. Run the following command inside the cloned repository to install all the dependencies :
 
 ```bash
@@ -8,8 +9,11 @@ npm install
 ```
 
 3. Replace `wrangler.example.toml` with `wrangler.toml` by removing the `.example` from the name and replace the environment variables with actual `prisma accelerate` and `database url` links, as they will be needed by the Cloudflare workers in production. For local development, use your **local** `postgres_db_link` and your **personal** `prisma_accelerate_link`.
+
 4. Replace the `.env.example` file with `.env` file and replace the enviornment variables there as well.
-5. Replace the `.dev.vars.example` file in the root directory with `.dev.vars` and copy the environment variables from `.env` in that file. This will allow Hono to use the environment variables during local development.
+
+5. **If there's a problem in local development then : Create `.dev.vars` file in the root directory and copy the environment variables from `.env` in that file. This will allow Hono to use the environment variables during local development.**
+
 6. Run the following command to run the server locally :
 
 ```bash
