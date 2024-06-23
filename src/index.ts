@@ -1,11 +1,12 @@
 import { Context, Hono } from "hono";
-import { createUser, getUsers } from "./db/userQueries";
+import { getUser } from "./db/userQueries";
+import { logger } from "hono/logger";
 
 const app = new Hono();
+app.use("*", logger());
 
-app.get("/", async (c: Context) => {
-  const res = await getUsers("rajneesh@gmail.com", c);
-  console.log("res  :", res);
+app.get("/getUser", async (c: Context) => {
+  const res = await getUser({ email: "rajneesh@gmail.com" }, c);
   return c.json({ res });
 });
 
