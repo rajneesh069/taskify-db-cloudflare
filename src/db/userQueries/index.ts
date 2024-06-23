@@ -46,7 +46,7 @@ export async function createUser(
   }
 }
 
-export async function UpdateUserPassword(
+export async function updateUserPassword(
   {
     email,
     password,
@@ -66,6 +66,7 @@ export async function UpdateUserPassword(
       select: {
         email: true,
         id: true,
+        password: true,
       },
     });
     return updatedUser;
