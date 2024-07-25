@@ -4,13 +4,14 @@ import { Context } from "hono";
 type AddTodo = {
   title: string;
   description: string;
-  userId: number;
+  email: string;
+  done: boolean;
 };
 
 type UpdateTodo = AddTodo & { todoId: number };
 
 export async function addTodo(
-  { title, description, userId }: AddTodo,
+  { title, description, email, done }: AddTodo,
   c: Context
 ) {
   try {
@@ -19,7 +20,8 @@ export async function addTodo(
       data: {
         title,
         description,
-        userId,
+        done,
+        email,
       },
     });
 
@@ -46,14 +48,14 @@ export async function getTodo({ todoId }: { todoId: number }, c: Context) {
 }
 
 export async function getTodosForAParticularUser(
-  { userId }: { userId: number },
+  { email }: { email: string },
   c: Context
 ) {
   try {
     const { todo } = getPrisma(c.env.DATABASE_URL);
     const todos = await todo.findMany({
       where: {
-        userId,
+        email,
       },
     });
     return todos;
@@ -64,7 +66,7 @@ export async function getTodosForAParticularUser(
 }
 
 export async function updateTodo(
-  { title, description, userId, todoId }: UpdateTodo,
+  { title, description, todoId }: UpdateTodo,
   c: Context
 ) {
   try {
@@ -72,7 +74,6 @@ export async function updateTodo(
     const updatedTodo = await todo.update({
       where: {
         id: todoId,
-        userId, //not necessary to use it, I am using it anyway
       },
       data: {
         title,
@@ -89,10 +90,10 @@ export async function updateTodo(
 export async function deleteTodo(
   {
     todoId,
-    userId,
+    email,
   }: {
     todoId: number;
-    userId: number;
+    email: string;
   },
   c: Context
 ) {
@@ -101,7 +102,7 @@ export async function deleteTodo(
     const deletedTodo = await todo.delete({
       where: {
         id: todoId,
-        userId,
+        email,
       },
     });
     return deletedTodo;

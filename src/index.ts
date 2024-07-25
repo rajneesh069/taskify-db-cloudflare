@@ -3,10 +3,12 @@ import {
   authorizeUser,
   createUser,
   getUser,
+  getUserTodos,
   updateUserDetails,
   updateUserPassword,
 } from "./db/userQueries";
 import { logger } from "hono/logger";
+import { addTodo } from "./db/todoQueries";
 
 const app = new Hono();
 app.use("*", logger());
@@ -48,6 +50,9 @@ app.post("/createUser", async (c: Context) => {
       { email, password, firstName, lastName, phoneNumber, token },
       c
     );
+    if (!createdUser) {
+      return c.json({ message: "Couldn't create user.", status: 400 });
+    }
     return c.json({ createdUser, status: 200 });
   } catch (error) {
     console.error(error);
@@ -93,5 +98,37 @@ app.post("/updateUser", async (c: Context) => {
     return c.json({ error, status: 500 });
   }
 });
+
+// todo queries
+app.post("/getUserTodos", async (c: Context) => {
+  try {
+    const { email } = await c.req.json();
+    const todos = await getUserTodos({ email }, c);
+    if (todos) return c.json({ todos, status: 200 });
+    return c.json({ message: "Can't find todos", status: 404 });
+  } catch (error) {
+    console.error(error);
+    return c.json({ error, status: 500 });
+  }
+});
+
+app.post("/createUserTodo", async (c: Context) => {
+  try {
+    const { title, description, done, email } = await c.req.json();
+    const createdTodo = await addTodo({ title, description, done, email }, c);
+    if (createdTodo) {
+      return c.json({ todo: createdTodo, status: 200 });
+    }
+    return c.json({
+      mesage: "Couldn't create todo.",
+      status: 400,
+    });
+  } catch (error) {
+    console.error(error);
+    return c.json({ error, status: 500 });
+  }
+});
+
+
 
 export default app;
