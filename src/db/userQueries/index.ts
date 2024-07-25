@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { Context } from "hono";
+
 const getPrisma = (database_url: string) => {
   const prisma = new PrismaClient({
     datasourceUrl: database_url,
@@ -14,10 +15,34 @@ type CreateUser = {
   firstName: string;
   lastName?: string;
   phoneNumber?: string;
+  token: string;
 };
 
+export async function authorizeUser(
+  { email, token }: { email: string; token: string },
+  c: Context
+) {
+  const { user } = getPrisma(c.env.DATABASE_URL);
+  try {
+    const isUser = await user.findFirst({
+      where: {
+        email,
+        token,
+      },
+      select: {
+        email: true,
+      },
+    });
+    if (!isUser) return null;
+    return isUser;
+  } catch (error) {
+    console.error(error);
+    return c.json({ error, status: 500 });
+  }
+}
+
 export async function createUser(
-  { email, password, firstName, lastName, phoneNumber }: CreateUser,
+  { email, password, firstName, lastName, phoneNumber, token }: CreateUser,
   c: Context
 ) {
   try {
@@ -29,6 +54,7 @@ export async function createUser(
         lastName,
         password,
         phoneNumber,
+        token,
       },
       select: {
         id: true,
@@ -39,7 +65,7 @@ export async function createUser(
       },
     });
 
-    return createdUser;
+    return createdUser || null;
   } catch (error) {
     console.error(error);
     throw error;
@@ -66,10 +92,9 @@ export async function updateUserPassword(
       select: {
         email: true,
         id: true,
-        password: true,
       },
     });
-    return updatedUser;
+    return updatedUser || null;
   } catch (error) {
     console.error(error);
     throw error;
@@ -100,19 +125,23 @@ export async function updateUserDetails(
         phoneNumber: true,
       },
     });
-    return updatedUser;
+    return updatedUser || null;
   } catch (error) {
     console.error(error);
     throw error;
   }
 }
 
-export async function getUser({ email }: { email: string }, c: Context) {
+export async function getUser(
+  { email, password }: { email: string; password: string },
+  c: Context
+) {
   try {
     const { user } = getPrisma(c.env.DATABASE_URL);
     const userDetails = await user.findFirst({
       where: {
         email,
+        password,
       },
       select: {
         firstName: true,
@@ -123,7 +152,7 @@ export async function getUser({ email }: { email: string }, c: Context) {
         todos: true,
       },
     });
-    return userDetails;
+    return userDetails || null;
   } catch (error) {
     throw error;
   }
@@ -140,7 +169,7 @@ export async function getUserTodos({ email }: { email: string }, c: Context) {
         todos: true,
       },
     });
-    return todos;
+    return todos || null;
   } catch (error) {
     console.error(error);
     throw error;

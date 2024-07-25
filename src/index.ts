@@ -1,5 +1,6 @@
 import { Context, Hono } from "hono";
 import {
+  authorizeUser,
   createUser,
   getUser,
   updateUserDetails,
@@ -10,10 +11,27 @@ import { logger } from "hono/logger";
 const app = new Hono();
 app.use("*", logger());
 
+// Home page query for testing
+app.get("/", async (c: Context) => {
+  return c.json({ message: "Hello World" });
+});
+
+// User queries
+app.post("/authUser", async (c: Context) => {
+  try {
+    const { email, token } = await c.req.json();
+    const user = await authorizeUser({ email, token }, c);
+    if (user) {
+      return c.json({ user, status: 200 });
+    }
+    return c.notFound();
+  } catch (error) {}
+});
+
 app.post("/getUser", async (c: Context) => {
   try {
-    const { email } = await c.req.json();
-    const user = await getUser({ email }, c);
+    const { email, password } = await c.req.json();
+    const user = await getUser({ email, password }, c);
     if (!user) return c.notFound();
     return c.json({ user, status: 200 });
   } catch (error) {
@@ -24,10 +42,10 @@ app.post("/getUser", async (c: Context) => {
 
 app.post("/createUser", async (c: Context) => {
   try {
-    const { email, password, firstName, lastName, phoneNumber } =
+    const { email, password, firstName, lastName, phoneNumber, token } =
       await c.req.json();
     const createdUser = await createUser(
-      { email, password, firstName, lastName, phoneNumber },
+      { email, password, firstName, lastName, phoneNumber, token },
       c
     );
     return c.json({ createdUser, status: 200 });
