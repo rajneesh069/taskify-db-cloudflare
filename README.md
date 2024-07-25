@@ -20,6 +20,16 @@ npm install
 npm run dev
 ```
 
+## Things which I've learned while building this worker
+
+1. Hono.js and its application in creating a serverless service
+2. Serverless backends and Cloudflare workers themselves
+3. Prisma ORM and its accelerate features
+
+## Purpose
+
+This small project hs been created to be integrated with a Todo App(fr it's cringy I know!), this will be accessed by an express server and then that server would talk to the main React app. I never intended to finish it, but it was so on the verge man and another Todo App, ughh!
+
 ## Some info about EDGE networks and Cloudflare Workers
 
 ### Edge Computing
