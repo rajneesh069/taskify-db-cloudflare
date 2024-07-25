@@ -3,12 +3,11 @@ import {
   authorizeUser,
   createUser,
   getUser,
-  getUserTodos,
   updateUserDetails,
   updateUserPassword,
 } from "./db/userQueries";
 import { logger } from "hono/logger";
-import { addTodo } from "./db/todoQueries";
+import { addTodo, deleteTodo, getTodos, updateTodo } from "./db/todoQueries";
 
 const app = new Hono();
 app.use("*", logger());
@@ -92,7 +91,7 @@ app.post("/updateUser", async (c: Context) => {
     if (!updatedUser) {
       return c.json({ message: "Couldn't update user details.", status: 400 });
     }
-    return c.json({ updatedUser });
+    return c.json({ updatedUser, status: 200 });
   } catch (error) {
     console.error(error);
     return c.json({ error, status: 500 });
@@ -103,7 +102,7 @@ app.post("/updateUser", async (c: Context) => {
 app.post("/getUserTodos", async (c: Context) => {
   try {
     const { email } = await c.req.json();
-    const todos = await getUserTodos({ email }, c);
+    const todos = await getTodos({ email }, c);
     if (todos) return c.json({ todos, status: 200 });
     return c.json({ message: "Can't find todos", status: 404 });
   } catch (error) {
@@ -117,7 +116,7 @@ app.post("/createUserTodo", async (c: Context) => {
     const { title, description, done, email } = await c.req.json();
     const createdTodo = await addTodo({ title, description, done, email }, c);
     if (createdTodo) {
-      return c.json({ todo: createdTodo, status: 200 });
+      return c.json({ createdTodo, status: 200 });
     }
     return c.json({
       mesage: "Couldn't create todo.",
@@ -129,6 +128,37 @@ app.post("/createUserTodo", async (c: Context) => {
   }
 });
 
+app.post("/updateUserTodo/:todoId", async (c: Context) => {
+  try {
+    const { todoId } = c.req.param();
+    let id = parseInt(todoId);
+    const { title, description, done, email } = await c.req.json();
+    const updatedTodo = await updateTodo(
+      { title, description, todoId: id, done, email },
+      c
+    );
+    if (!updatedTodo)
+      return c.json({ message: "Can't update todo.", status: 400 });
+    return c.json({ updatedTodo, status: 200 });
+  } catch (error) {
+    console.error(error);
+    return c.json({ error, status: 500 });
+  }
+});
 
+app.post("/deleteTodo/:todoId", async (c: Context) => {
+  try {
+    const { todoId } = c.req.param();
+    let id = parseInt(todoId);
+    const { email } = await c.req.json();
+    const deletedTodo = await deleteTodo({ todoId: id, email }, c);
+    if (!deletedTodo)
+      return c.json({ message: "Can't delete todo.", status: 400 });
+    return c.json({ deletedTodo, status: 200 });
+  } catch (error) {
+    console.error(error);
+    return c.json({ error, status: 500 });
+  }
+});
 
 export default app;

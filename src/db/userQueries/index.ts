@@ -158,20 +158,3 @@ export async function getUser(
   }
 }
 
-export async function getUserTodos({ email }: { email: string }, c: Context) {
-  try {
-    const { user } = getPrisma(c.env.DATABASE_URL);
-    const todos = await user.findFirst({
-      where: {
-        email,
-      },
-      select: {
-        todos: true,
-      },
-    });
-    return todos || null;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-}

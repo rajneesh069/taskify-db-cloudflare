@@ -25,32 +25,14 @@ export async function addTodo(
       },
     });
 
-    return addedTodo;
+    return addedTodo || null;
   } catch (error) {
     console.error(error);
     throw error;
   }
 }
 
-export async function getTodo({ todoId }: { todoId: number }, c: Context) {
-  try {
-    const { todo } = getPrisma(c.env.DATABASE_URL);
-    const todoDetails = await todo.findFirst({
-      where: {
-        id: todoId,
-      },
-    });
-    return todoDetails;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-}
-
-export async function getTodosForAParticularUser(
-  { email }: { email: string },
-  c: Context
-) {
+export async function getTodos({ email }: { email: string }, c: Context) {
   try {
     const { todo } = getPrisma(c.env.DATABASE_URL);
     const todos = await todo.findMany({
@@ -58,7 +40,7 @@ export async function getTodosForAParticularUser(
         email,
       },
     });
-    return todos;
+    return todos || null;
   } catch (error) {
     console.error(error);
     throw error;
@@ -66,7 +48,7 @@ export async function getTodosForAParticularUser(
 }
 
 export async function updateTodo(
-  { title, description, todoId }: UpdateTodo,
+  { title, description, todoId, email, done }: UpdateTodo,
   c: Context
 ) {
   try {
@@ -74,13 +56,15 @@ export async function updateTodo(
     const updatedTodo = await todo.update({
       where: {
         id: todoId,
+        email,
       },
       data: {
         title,
         description,
+        done,
       },
     });
-    return updatedTodo;
+    return updatedTodo || null;
   } catch (error) {
     console.error(error);
     throw error;
@@ -105,7 +89,7 @@ export async function deleteTodo(
         email,
       },
     });
-    return deletedTodo;
+    return deletedTodo || null;
   } catch (error) {
     console.error(error);
     throw error;
