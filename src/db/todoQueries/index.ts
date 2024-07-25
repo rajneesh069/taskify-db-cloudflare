@@ -1,12 +1,5 @@
-import { PrismaClient } from "@prisma/client/edge";
-import { withAccelerate } from "@prisma/extension-accelerate";
+import getPrisma from "../prisma";
 import { Context } from "hono";
-const getPrisma = (database_url: string) => {
-  const prisma = new PrismaClient({
-    datasourceUrl: database_url,
-  }).$extends(withAccelerate());
-  return prisma;
-};
 
 type AddTodo = {
   title: string;
