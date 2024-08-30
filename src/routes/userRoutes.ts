@@ -4,7 +4,6 @@ import { z } from "zod";
 const app = new Hono();
 
 const userSchema = z.object({
-  id: z.string().uuid(),
   username: z
     .string()
     .min(1, "Username is required")
@@ -36,7 +35,7 @@ type UserData = z.infer<typeof userSchema>;
 // create user for sign-up purposes
 app.post("/create", async (c: Context) => {
   const prisma = getPrisma(c.env.DATABASE_URL);
-  const result = userSchema.safeParse(await c.req.parseBody());
+  const result = userSchema.safeParse(await c.req.json());
 
   if (!result.success) {
     return c.json(
@@ -68,7 +67,7 @@ app.post("/create", async (c: Context) => {
 // get user by id and password for sign-in purposes
 app.post("/find", async (c: Context) => {
   const prisma = getPrisma(c.env.DATABASE_URL);
-  const result = userSignInSchema.safeParse(await c.req.parseBody());
+  const result = userSignInSchema.safeParse(await c.req.json());
   if (!result.success) {
     return c.json(
       { message: "Invalid Sign In data", error: result.error.errors },

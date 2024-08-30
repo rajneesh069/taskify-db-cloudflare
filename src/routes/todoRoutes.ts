@@ -5,7 +5,6 @@ const app = new Hono();
 import { z } from "zod";
 
 const todoSchema = z.object({
-  id: z.string().uuid(),
   title: z
     .string()
     .min(1, "Title is required")
@@ -41,7 +40,7 @@ app.get("/:userId", async (c: Context) => {
 // create a todo given a user id
 app.post("/create", async (c: Context) => {
   const prisma = getPrisma(c.env.DATABASE_URL);
-  const result = todoSchema.safeParse(await c.req.parseBody());
+  const result = todoSchema.safeParse(await c.req.json());
   if (!result.success) {
     return c.json(
       { message: "Invalid Todo Data", error: result.error.errors },
@@ -92,7 +91,7 @@ app.get("/:todoId", async (c: Context) => {
 app.put("/:todoId", async (c: Context) => {
   const todoId = c.req.param("todoId");
   const prisma = getPrisma(c.env.DATABASE_URL);
-  const result = todoSchema.safeParse(await c.req.parseBody());
+  const result = todoSchema.safeParse(await c.req.json());
   if (!result.success) {
     return c.json(
       { message: "Invalid Todo Data", error: result.error.errors },
