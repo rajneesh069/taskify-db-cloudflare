@@ -10,6 +10,10 @@
     "lib": ["ESNext"],
     "types": ["@cloudflare/workers-types"],
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
+    "jsxImportSource": "hono/jsx",
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"]
+    }
   }
 }
