@@ -23,7 +23,7 @@ model User {
 model Todo {
   id          String   @id @unique @default(uuid())
   title       String   @db.VarChar(300)
-  description String   @db.VarChar(600)
+  description String?   @db.VarChar(600)
   isComplete  Boolean
   userId      String
   tags        String[]
