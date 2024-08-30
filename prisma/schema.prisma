@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -16,10 +17,10 @@ model User {
 }
 
 model Todo {
-  id         String  @id @unique @default(uuid())
+  id         String   @id @unique @default(uuid())
   title      String
   isComplete Boolean
   userId     String
   tags       String[]
-  user       User    @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
 }
