@@ -32,7 +32,6 @@ const userSignInSchema = z
   });
 
 type UserData = z.infer<typeof userSchema>;
-type UserSignInData = z.infer<typeof userSignInSchema>;
 
 // create user for sign-up purposes
 app.post("/create", async (c: Context) => {
@@ -59,7 +58,10 @@ app.post("/create", async (c: Context) => {
     });
     return c.json({ user }, { status: 200 });
   } catch (error) {
-    return c.json({ message: "Error registering the user." }, { status: 500 });
+    return c.json(
+      { message: "Error registering the user.", error },
+      { status: 500 }
+    );
   }
 });
 
@@ -91,12 +93,15 @@ app.post("/find", async (c: Context) => {
       },
     });
     if (!user) {
-      return c.json({ message: "User credentials invalid" }, { status: 401 });
+      return c.json(
+        { message: "User credentials invalid", user },
+        { status: 401 }
+      );
     }
     return c.json({ message: "User Found", user }, { status: 200 });
   } catch (error) {
     console.error(error);
-    return c.json({ message: "Database Error" }, { status: 500 });
+    return c.json({ message: "Database Error", error: error }, { status: 500 });
   }
 });
 
@@ -121,12 +126,15 @@ app.get("/:id", async (c: Context) => {
       },
     });
     if (!user) {
-      return c.json({ message: "User doesn't exist" }, { status: 404 });
+      return c.json(
+        { message: "User doesn't exist", user },
+        { status: 404 }
+      );
     }
     return c.json({ message: "User Found", user }, { status: 200 });
   } catch (error) {
     console.error(error);
-    return c.json({ message: "Couldn't fetch user" }, { status: 500 });
+    return c.json({ message: "Couldn't fetch user", error }, { status: 500 });
   }
 });
 
