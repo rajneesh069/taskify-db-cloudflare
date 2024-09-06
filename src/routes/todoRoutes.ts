@@ -58,6 +58,7 @@ app.post("/create", async (c: Context) => {
         userId: true,
         createdAt: true,
         updatedAt: true,
+        user: true,
       },
     });
     return c.json({ message: "Todo Created", todo }, { status: 200 });

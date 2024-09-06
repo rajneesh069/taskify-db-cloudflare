@@ -24,7 +24,6 @@ const userSignInSchema = z
   .object({
     username: z.string().min(1, "Username cannot be empty").optional(),
     email: z.string().email("Invalid email address").optional(),
-    password: z.string().min(6, "Password must be at least 6 characters long"),
   })
   .refine((data) => data.username || data.email, {
     message: "Either username or email must be provided",
@@ -64,10 +63,11 @@ app.post("/create", async (c: Context) => {
   }
 });
 
-// get user by id and password for sign-in purposes
+// get user by id for sign-in purposes
 app.post("/find", async (c: Context) => {
   const prisma = getPrisma(c.env.DATABASE_URL);
   const result = userSignInSchema.safeParse(await c.req.json());
+  console.log(result.data);
   if (!result.success) {
     return c.json(
       { message: "Invalid Sign In data", error: result.error.errors },
@@ -80,14 +80,12 @@ app.post("/find", async (c: Context) => {
     const user = await prisma.user.findFirst({
       where: {
         OR: [{ username: userData.username }, { email: userData.email }],
-        password: userData.password,
       },
       select: {
         id: true,
         email: true,
         username: true,
-      },
-      include: {
+        password: true,
         todos: true,
       },
     });
@@ -119,16 +117,11 @@ app.get("/:id", async (c: Context) => {
         username: true,
         firstName: true,
         lastName: true,
-      },
-      include: {
         todos: true,
       },
     });
     if (!user) {
-      return c.json(
-        { message: "User doesn't exist", user },
-        { status: 404 }
-      );
+      return c.json({ message: "User doesn't exist", user }, { status: 404 });
     }
     return c.json({ message: "User Found", user }, { status: 200 });
   } catch (error) {
