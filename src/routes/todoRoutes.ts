@@ -29,7 +29,7 @@ app.get("/:userId", async (c: Context) => {
       },
     });
     if (todos.length == 0) {
-      return c.json({ message: "No Todos Found", todos }, { status: 404 });
+      return c.json({ message: "No Todos Found", todos:null }, { status: 404 });
     }
     return c.json({ message: "Todos Found", todos }, { status: 200 });
   } catch (error) {
@@ -55,10 +55,9 @@ app.post("/create", async (c: Context) => {
         title: true,
         description: true,
         isComplete: true,
-        userId: true,
+        userId: true, // it will be sent from the auth token generated using JWT
         createdAt: true,
         updatedAt: true,
-        user: true,
       },
     });
     return c.json({ message: "Todo Created", todo }, { status: 200 });

@@ -67,7 +67,7 @@ app.post("/create", async (c: Context) => {
 app.post("/find", async (c: Context) => {
   const prisma = getPrisma(c.env.DATABASE_URL);
   const result = userSignInSchema.safeParse(await c.req.json());
-  console.log(result.data);
+
   if (!result.success) {
     return c.json(
       { message: "Invalid Sign In data", error: result.error.errors },
